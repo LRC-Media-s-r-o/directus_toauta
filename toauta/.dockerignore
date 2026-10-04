@@ -1,0 +1,9 @@
+# Allowlist. Dokploy writes the deployment .env (with secrets) next to docker-compose.yml,
+# which is inside this build context, so everything not listed here stays out of the build.
+*
+!Dockerfile
+!extensions/directus-extension-display-car-images/package.json
+!extensions/directus-extension-display-car-images/package-lock.json
+!extensions/directus-extension-display-car-images/tsconfig.json
+!extensions/directus-extension-display-car-images/postcss.config.mjs
+!extensions/directus-extension-display-car-images/src

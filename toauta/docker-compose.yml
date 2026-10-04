@@ -1,0 +1,126 @@
+services:
+  directus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: toauta-directus-car-images:12.3.1
+    restart: unless-stopped
+
+    expose:
+      - 8055
+
+    volumes:
+      - directus_uploads:/directus/uploads
+
+    depends_on:
+      cache:
+        condition: service_healthy
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --spider -q http://127.0.0.1:8055/server/ping || exit 1"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_interval: 5s
+      start_period: 30s
+
+    environment:
+      # Directus
+      SECRET: ${DIRECTUS_SECRET}
+
+      PUBLIC_URL: ${PUBLIC_URL}
+      WEBSOCKETS_ENABLED: "true"
+
+      # --------------------------------------------------
+      # SUPABASE CLOUD POSTGRES
+      # --------------------------------------------------
+
+      DB_CLIENT: "pg"
+
+      # Example:
+      # aws-0-eu-central-1.pooler.supabase.com
+      DB_HOST: ${SUPABASE_DB_HOST}
+
+      # IMPORTANT: Session Pooler = 5432
+      DB_PORT: "5432"
+
+      # Normally "postgres"
+      DB_DATABASE: ${SUPABASE_DB_NAME}
+
+      # IMPORTANT:
+      # For Supabase Session Pooler this is:
+      # postgres.<PROJECT_REF>
+      DB_USER: ${SUPABASE_DB_USER}
+
+      DB_PASSWORD: ${SUPABASE_DB_PASSWORD}
+
+      # Supabase requires SSL.
+      # This creates the SSL config object Directus/pg expects.
+      DB_SSL__REJECT_UNAUTHORIZED: "false"
+
+      # Optional: don't let Directus consume too many
+      # Supabase DB connections
+      DB_POOL__MIN: "0"
+      DB_POOL__MAX: "10"
+
+      # --------------------------------------------------
+      # REDIS
+      # --------------------------------------------------
+
+      CACHE_ENABLED: "true"
+      CACHE_AUTO_PURGE: "true"
+      CACHE_STORE: "redis"
+
+      REDIS: "redis://cache:6379"
+
+      # Recommended when using Redis with Directus
+      RATE_LIMITER_STORE: "redis"
+      RATE_LIMITER_REDIS: "redis://cache:6379"
+
+      # --------------------------------------------------
+      # INITIAL ADMIN
+      # --------------------------------------------------
+
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+
+      # --------------------------------------------------
+      # STORAGE
+      # --------------------------------------------------
+
+      STORAGE_LOCATIONS: "local"
+      STORAGE_LOCAL_DRIVER: "local"
+      STORAGE_LOCAL_ROOT: "/directus/uploads"
+
+      # Optional Directus license
+      LICENSE_KEY: ${LICENSE_KEY}
+
+      # --------------------------------------------------
+      # CONTENT SECURITY POLICY
+      # --------------------------------------------------
+
+      # Full img-src list. A single value would replace the default and drop 'self', data: and blob:.
+      CONTENT_SECURITY_POLICY_DIRECTIVES__IMG_SRC: "'self',data:,blob:,https://raw.githubusercontent.com,https://avatars.githubusercontent.com,https://toautacz.hel1.your-objectstorage.com,https://huuzqjakowbbmvlysguw.supabase.co"
+
+  cache:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "[ $$(redis-cli ping) = 'PONG' ]"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_interval: 5s
+      start_period: 30s
+
+volumes:
+  directus_uploads:

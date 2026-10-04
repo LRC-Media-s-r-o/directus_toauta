@@ -1,0 +1,45 @@
+{
+  "name": "directus-extension-display-car-images",
+  "description": "View-only thumbnails for cars.images (Postgres text[] of public image URLs).",
+  "version": "1.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "keywords": [
+    "directus",
+    "directus-extension",
+    "directus-extension-bundle"
+  ],
+  "files": [
+    "dist"
+  ],
+  "directus:extension": {
+    "type": "bundle",
+    "path": {
+      "app": "dist/app.js",
+      "api": "dist/api.js"
+    },
+    "entries": [
+      {
+        "type": "display",
+        "name": "car-images-display",
+        "source": "src/index.ts"
+      },
+      {
+        "type": "interface",
+        "name": "car-images-interface",
+        "source": "src/interface.ts"
+      }
+    ],
+    "host": "^12.3.1"
+  },
+  "scripts": {
+    "build": "directus-extension build",
+    "dev": "directus-extension build -w --no-minify",
+    "test": "node --test src/normalize.test.mjs"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "18.0.4",
+    "vue": "3.5.24"
+  }
+}
