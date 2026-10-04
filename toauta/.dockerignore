@@ -7,3 +7,6 @@
 !extensions/directus-extension-display-car-images/tsconfig.json
 !extensions/directus-extension-display-car-images/postcss.config.mjs
 !extensions/directus-extension-display-car-images/src
+!extensions/directus-extension-hook-car-write-contract/package.json
+!extensions/directus-extension-hook-car-write-contract/package-lock.json
+!extensions/directus-extension-hook-car-write-contract/src
